@@ -20,6 +20,8 @@
             padding: 30px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
         }
         h1 {
             margin-bottom: 20px;
@@ -56,6 +58,16 @@
         .success {
             color: green;
         }
+        .key-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .key-item {
+            background-color: #f0f0f0;
+            padding: 5px;
+            margin: 2px 0;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -68,9 +80,28 @@
     <button class="button" onclick="checkKey()">Check Key</button>
 
     <div class="result" id="result"></div>
+    
+    <div class="key-list" id="keyList">
+        <h3>Generated Keys:</h3>
+        <ul id="keyListContainer"></ul>
+    </div>
 </div>
 
 <script>
+    // Check and load existing keys from localStorage
+    function loadKeys() {
+        const keys = JSON.parse(localStorage.getItem('generatedKeys')) || [];
+        const keyListContainer = document.getElementById('keyListContainer');
+        keyListContainer.innerHTML = ''; // Clear the current list
+
+        keys.forEach(key => {
+            const li = document.createElement('li');
+            li.classList.add('key-item');
+            li.textContent = key;
+            keyListContainer.appendChild(li);
+        });
+    }
+
     // Function to generate a random key
     function generateKey() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -78,17 +109,22 @@
         for (let i = 0; i < 16; i++) {
             key += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        localStorage.setItem('generatedKey', key);
+
+        let keys = JSON.parse(localStorage.getItem('generatedKeys')) || [];
+        keys.push(key);
+        localStorage.setItem('generatedKeys', JSON.stringify(keys));
+
+        loadKeys();
         alert('Generated Key: ' + key);
     }
 
     // Function to check the entered key
     function checkKey() {
         const enteredKey = document.getElementById('keyInput').value;
-        const storedKey = localStorage.getItem('generatedKey');
-
+        const keys = JSON.parse(localStorage.getItem('generatedKeys')) || [];
+        
         const result = document.getElementById('result');
-        if (enteredKey === storedKey) {
+        if (keys.includes(enteredKey)) {
             result.textContent = 'Correct Key!';
             result.className = 'result success';
         } else {
@@ -96,6 +132,9 @@
             result.className = 'result error';
         }
     }
+
+    // Initialize and load the keys when the page is loaded
+    window.onload = loadKeys;
 </script>
 
 </body>
