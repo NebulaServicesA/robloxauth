@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Generator</title>
+    <style>
+        body {
+            background: #0f0f1a;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #1a1a2e;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+        }
+        .key-list {
+            margin: 20px 0;
+            padding: 10px;
+            background: #16162a;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .key-item {
+            background: #242442;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            background: #4a4ad8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #3a3ab8;
+        }
+        .delete-btn {
+            background: #d83a3a;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        .delete-btn:hover {
+            background: #b83030;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Key Generator</h2>
+        <button onclick="generateKey()">Generate New Key</button>
+        <div class="key-list" id="keyList"></div>
+    </div>
+
+    <script>
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for(let i = 0; i < 16; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            saveKey(key);
+            displayKeys();
+        }
+
+        function saveKey(key) {
+            let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+            keys.push(key);
+            localStorage.setItem('keys', JSON.stringify(keys));
+        }
+
+        function deleteKey(index) {
+            let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+            keys.splice(index, 1);
+            localStorage.setItem('keys', JSON.stringify(keys));
+            displayKeys();
+        }
+
+        function displayKeys() {
+            const keyList = document.getElementById('keyList');
+            const keys = JSON.parse(localStorage.getItem('keys') || '[]');
+            keyList.innerHTML = '';
+            
+            keys.forEach((key, index) => {
+                const keyItem = document.createElement('div');
+                keyItem.className = 'key-item';
+                keyItem.innerHTML = `
+                    <span>${key}</span>
+                    <button class="delete-btn" onclick="deleteKey(${index})">Delete</button>
+                `;
+                keyList.appendChild(keyItem);
+            });
+        }
+
+        // Display keys on page load
+        displayKeys();
+    </script>
+</body>
+</html>
