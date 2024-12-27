@@ -6,141 +6,97 @@
     <title>Key Generator</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 350px;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
         h1 {
-            font-size: 24px;
             margin-bottom: 20px;
-        }
-        .key-box {
-            font-size: 18px;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
         }
         .button {
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 15px 32px;
             font-size: 16px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 5px;
+            margin-top: 10px;
             transition: background-color 0.3s;
         }
         .button:hover {
             background-color: #45a049;
         }
-        .error-message {
-            color: red;
+        input {
+            padding: 10px;
+            font-size: 16px;
             margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
-        .key-list {
+        .result {
             margin-top: 20px;
-            padding: 0;
-            list-style-type: none;
-            text-align: left;
+            font-size: 18px;
+            color: #333;
         }
-        .key-list li {
-            background-color: #f8f8f8;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 4px;
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Key Generator</h1>
-        <input id="key-input" class="key-box" type="text" placeholder="Generated Key" readonly>
-        <br>
-        <button class="button" id="generate-key">Generate Key</button>
-        <br><br>
-        <input id="check-key" class="key-box" type="text" placeholder="Enter Key to Check">
-        <br><br>
-        <button class="button" id="check-key-btn">Check Key</button>
-        <br><br>
-        <div class="error-message" id="error-message"></div>
 
-        <h2>Generated Keys</h2>
-        <ul class="key-list" id="key-list"></ul>
-    </div>
+<div class="container">
+    <h1>Key Generator</h1>
+    <button class="button" onclick="generateKey()">Generate Key</button>
+    <br><br>
+    <input type="text" id="keyInput" placeholder="Enter your key here">
+    <button class="button" onclick="checkKey()">Check Key</button>
 
-    <script>
-        // Function to generate a random key
-        function generateKey() {
-            let key = '';
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            for (let i = 0; i < 16; i++) {
-                key += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            // Display the new key
-            document.getElementById('key-input').value = key;
+    <div class="result" id="result"></div>
+</div>
 
-            // Retrieve saved keys from localStorage
-            let savedKeys = JSON.parse(localStorage.getItem('keys')) || [];
-            savedKeys.push(key);
-
-            // Save the updated list of keys to localStorage
-            localStorage.setItem('keys', JSON.stringify(savedKeys));
-
-            // Update the key list on the page
-            updateKeyList();
+<script>
+    // Function to generate a random key
+    function generateKey() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let key = '';
+        for (let i = 0; i < 16; i++) {
+            key += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+        localStorage.setItem('generatedKey', key);
+        alert('Generated Key: ' + key);
+    }
 
-        // Function to update the displayed list of keys
-        function updateKeyList() {
-            const keyList = document.getElementById('key-list');
-            keyList.innerHTML = ''; // Clear existing list
-            const savedKeys = JSON.parse(localStorage.getItem('keys')) || [];
+    // Function to check the entered key
+    function checkKey() {
+        const enteredKey = document.getElementById('keyInput').value;
+        const storedKey = localStorage.getItem('generatedKey');
 
-            savedKeys.forEach((key, index) => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Key ${index + 1}: ${key}`;
-                keyList.appendChild(listItem);
-            });
+        const result = document.getElementById('result');
+        if (enteredKey === storedKey) {
+            result.textContent = 'Correct Key!';
+            result.className = 'result success';
+        } else {
+            result.textContent = 'Not Correct Key!';
+            result.className = 'result error';
         }
+    }
+</script>
 
-        // Function to check the entered key
-        function checkKey() {
-            const enteredKey = document.getElementById('check-key').value;
-            const savedKeys = JSON.parse(localStorage.getItem('keys')) || [];
-            const errorMessageElement = document.getElementById('error-message');
-
-            if (savedKeys.includes(enteredKey)) {
-                errorMessageElement.textContent = 'Key is correct! Key: ' + enteredKey;
-                errorMessageElement.style.color = 'green';
-            } else {
-                errorMessageElement.textContent = 'Not correct key!';
-                errorMessageElement.style.color = 'red';
-            }
-        }
-
-        // Event listeners
-        document.getElementById('generate-key').addEventListener('click', generateKey);
-        document.getElementById('check-key-btn').addEventListener('click', checkKey);
-
-        // Check if there are any saved keys on page load
-        window.onload = function() {
-            updateKeyList();
-        }
-    </script>
 </body>
 </html>
