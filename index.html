@@ -82,7 +82,7 @@
             
             let keysHtml = '<h3>Generated Keys:</h3>';
             keys.forEach(key => {
-                keysHtml += `<div class="key-item">${key}</div>`;
+                keysHtml += `<div class="key-item" data-key="${key}">${key}</div>`;
             });
             
             keysList.innerHTML = keysHtml;
