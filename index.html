@@ -80,10 +80,14 @@
         <div class="keys-list" id="keysList"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const supabaseUrl = 'https://qwvcwzwhtgsyrxzxkove.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dmN3endodGdzeXJ4enhrb3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0MjE0MjgsImV4cCI6MjA1MDk5NzQyOH0.XRGQN4CriGsPOLeqRaIMAxuXYv0VwnwKjPCGlrn6JxI'
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+
         const generateBtn = document.querySelector('.generate-btn');
         const keysList = document.getElementById('keysList');
-        let keys = JSON.parse(localStorage.getItem('keys')) || [];
 
         function generateKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -95,24 +99,45 @@
             return key;
         }
 
-        function displayKeys() {
+        async function displayKeys() {
+            const { data: keys, error } = await supabase
+                .from('keys')
+                .select('*')
+            
+            if (error) {
+                console.error('Error fetching keys:', error);
+                return;
+            }
+
             keysList.innerHTML = '';
-            keys.forEach(key => {
+            keys.forEach(keyObj => {
                 const keyItem = document.createElement('div');
                 keyItem.className = 'key-item';
-                keyItem.textContent = key;
+                keyItem.textContent = keyObj.key_value;
                 keysList.appendChild(keyItem);
             });
         }
 
-        generateBtn.addEventListener('click', () => {
+        generateBtn.addEventListener('click', async () => {
             const newKey = generateKey();
-            keys.push(newKey);
-            localStorage.setItem('keys', JSON.stringify(keys));
+            const { error } = await supabase
+                .from('keys')
+                .insert([{ key_value: newKey }])
+            
+            if (error) {
+                console.error('Error inserting key:', error);
+                return;
+            }
+
             displayKeys();
         });
 
         displayKeys();
+
+        supabase
+            .channel('keys_channel')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'keys' }, displayKeys)
+            .subscribe()
     </script>
 </body>
 </html>
