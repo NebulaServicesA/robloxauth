@@ -10,88 +10,109 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
+
         body {
-            background: #0f0f1a;
+            background: #0f0f0f;
             color: #fff;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            padding: 2rem;
         }
+
         .container {
-            background: #1a1a2e;
+            max-width: 800px;
+            width: 100%;
+            background: #1a1a1a;
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 500px;
         }
+
         h1 {
             text-align: center;
             margin-bottom: 2rem;
-            color: #4f8cff;
+            color: #4f46e5;
         }
-        button {
-            background: #4f8cff;
+
+        .generate-btn {
+            background: #4f46e5;
             color: white;
             border: none;
             padding: 1rem 2rem;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
             font-size: 1rem;
-            transition: 0.3s;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 2rem;
         }
-        button:hover {
-            background: #3a7aff;
+
+        .generate-btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
         }
+
         .keys-list {
-            margin-top: 2rem;
-            background: #252542;
+            background: #242424;
             padding: 1rem;
             border-radius: 5px;
             max-height: 300px;
             overflow-y: auto;
         }
+
         .key-item {
-            background: #1a1a2e;
-            padding: 0.8rem;
+            background: #333;
             margin: 0.5rem 0;
+            padding: 1rem;
             border-radius: 5px;
-            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Key Generator</h1>
-        <button onclick="generateKey()">Generate Key</button>
+        <button class="generate-btn">Generate Key</button>
         <div class="keys-list" id="keysList"></div>
     </div>
 
     <script>
+        const generateBtn = document.querySelector('.generate-btn');
+        const keysList = document.getElementById('keysList');
+        let keys = JSON.parse(localStorage.getItem('keys')) || [];
+
         function generateKey() {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let key = '';
-            for(let i = 0; i < 24; i++) {
-                if(i > 0 && i % 6 === 0) key += '-';
-                key += characters.charAt(Math.floor(Math.random() * characters.length));
+            for(let i = 0; i < 16; i++) {
+                if(i > 0 && i % 4 === 0) key += '-';
+                key += chars[Math.floor(Math.random() * chars.length)];
             }
-            
-            let keys = JSON.parse(localStorage.getItem('keys') || '[]');
-            keys.push(key);
-            localStorage.setItem('keys', JSON.stringify(keys));
-            displayKeys();
+            return key;
         }
 
         function displayKeys() {
-            const keysList = document.getElementById('keysList');
-            const keys = JSON.parse(localStorage.getItem('keys') || '[]');
-            keysList.innerHTML = keys.map(key => `<div class="key-item">${key}</div>`).join('');
+            keysList.innerHTML = '';
+            keys.forEach(key => {
+                const keyItem = document.createElement('div');
+                keyItem.className = 'key-item';
+                keyItem.textContent = key;
+                keysList.appendChild(keyItem);
+            });
         }
 
-        window.onload = displayKeys;
+        generateBtn.addEventListener('click', () => {
+            const newKey = generateKey();
+            keys.push(newKey);
+            localStorage.setItem('keys', JSON.stringify(keys));
+            displayKeys();
+        });
+
+        displayKeys();
     </script>
 </body>
 </html>
-
