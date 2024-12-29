@@ -148,7 +148,6 @@
             }
         }
 
-        /* New styles */
         .settings-btn {
             position: fixed;
             bottom: 20px;
@@ -273,11 +272,11 @@
 
         let likeCompleted = false;
         let subCompleted = false;
-        let timeOnSite = 0;
-        let lastKeyGeneration = localStorage.getItem('lastKeyGeneration') || 0;
         let isDiddyMode = false;
+        let timeOnSite = 0;
         const WAIT_TIME = 480; // 8 minutes in seconds
         const DAY_IN_MS = 86400000;
+        let lastKeyGeneration = localStorage.getItem('lastKeyGeneration') || 0;
 
         function createSnowflakes() {
             const snowflake = document.createElement('div');
@@ -299,8 +298,25 @@
         function toggleDiddyMode() {
             isDiddyMode = !isDiddyMode;
             document.body.style.background = isDiddyMode 
-                ? `url('https://c.files.bbci.co.uk/ffe3/live/86564f40-7ab4-11ef-aa23-ff25bf1fd4c4.jpg') center/cover`
+                ? 'url("https://c.files.bbci.co.uk/ffe3/live/86564f40-7ab4-11ef-aa23-ff25bf1fd4c4.jpg") center/cover'
                 : 'linear-gradient(135deg, #0f0f1f, #1f1f3f)';
+        }
+
+        async function generateKey() {
+            const { data, error } = await supabaseClient
+                .from('keys')
+                .insert([{
+                    key_value: crypto.randomUUID(),
+                    expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                    already_redeemed: false
+                }])
+                .select();
+
+            if (error) {
+                console.error('Error:', error);
+                return null;
+            }
+            return data[0].key_value;
         }
 
         function updateTimers() {
@@ -332,66 +348,38 @@
             }
         }
 
-        // Update the generateKey function
+        document.getElementById('likeBtn').addEventListener('click', async () => {
+            window.open('https://www.youtube.com/watch?v=ViTGUTtPzT4', '_blank');
+            setTimeout(() => {
+                document.getElementById('likeCheck').style.display = 'inline';
+                likeCompleted = true;
+                updateTimers();
+            }, 1000);
+        });
+
+        document.getElementById('subBtn').addEventListener('click', async () => {
+            window.open('https://www.youtube.com/@DiddyKingChill/videos', '_blank');
+            setTimeout(() => {
+                document.getElementById('subCheck').style.display = 'inline';
+                subCompleted = true;
+                updateTimers();
+            }, 1000);
+        });
+
         document.getElementById('generateBtn').addEventListener('click', async () => {
-            if (timeOnSite < WAIT_TIME) return;
-            
+            if (!likeCompleted || !subCompleted) return;
+
             const key = await generateKey();
             if (key) {
-                const keyDiv = document.getElementById('generatedKey');
-                keyDiv.style.display = 'block';
-                keyDiv.innerHTML = `Your Key: ${key} <button class="copy-btn" onclick="copyKey('${key}')">Copy</button>`;
-                lastKeyGeneration = Date.now();
-                localStorage.setItem('lastKeyGeneration', lastKeyGeneration);
-                updateTimers();
+                document.getElementById('generatedKey').textContent = `Your key is: ${key}`;
+                document.getElementById('generatedKey').style.display = 'block';
+                localStorage.setItem('lastKeyGeneration', Date.now().toString());
+                lastKeyGeneration = Date.now().toString();
             }
         });
 
-        function copyKey(key) {
-            navigator.clipboard.writeText(key);
-            const copyBtn = document.querySelector('.copy-btn');
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = 'Copy', 2000);
-        }
-
-        async function generateKey() {
-            const { data, error } = await supabaseClient
-                .from('keys')
-                .insert([{
-                    key_value: Math.random().toString(36).substring(2, 15)
-                }])
-                .select('key_value');
-
-            if (error) {
-                console.error('Error generating key:', error);
-                return null;
-            }
-
-            return data[0].key_value;
-        }
-
-        document.getElementById('likeBtn').addEventListener('click', () => {
-            likeCompleted = true;
-            document.getElementById('likeCheck').style.display = 'inline';
-            checkEligibility();
-        });
-
-        document.getElementById('subBtn').addEventListener('click', () => {
-            subCompleted = true;
-            document.getElementById('subCheck').style.display = 'inline';
-            checkEligibility();
-        });
-
-        function checkEligibility() {
-            if (likeCompleted && subCompleted && timeOnSite >= WAIT_TIME) {
-                document.getElementById('generateBtn').style.display = 'inline-block';
-            }
-        }
-
-        setInterval(() => {
-            updateTimers();
-            if (Math.random() < 0.1) createSnowflakes();
-        }, 1000);
+        setInterval(createSnowflakes, 200);
+        setInterval(updateTimers, 1000);
     </script>
 </body>
 </html>
