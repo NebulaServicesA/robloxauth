@@ -1,181 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key System</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f0f1f, #1f1f3f);
-            font-family: 'Arial', sans-serif;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
+[Previous head content remains the same until styles]
 
-        .container {
-            text-align: center;
-            z-index: 1;
-            background: rgba(25, 25, 35, 0.95);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7),
-                        0 0 60px rgba(51, 102, 255, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+<style>
+    /* Add these new styles to the existing ones */
+    .settings-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
 
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 2.5rem;
-            background: linear-gradient(45deg, #ff3366, #ff6b6b, #3366ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
-            animation: glow 2s ease-in-out infinite alternate;
-        }
+    .settings-panel {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: rgba(25, 25, 35, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        display: none;
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
 
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
-            }
-            to {
-                text-shadow: 0 0 30px rgba(255, 51, 102, 0.8);
-            }
-        }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
 
-        .btn {
-            padding: 1.2rem 2.5rem;
-            margin: 1rem;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            width: 250px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-        }
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
-        .btn-red {
-            background: linear-gradient(45deg, #ff3366, #ff6b6b);
-            box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
-        }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
 
-        .btn-blue {
-            background: linear-gradient(45deg, #3366ff, #33ccff);
-            box-shadow: 0 0 20px rgba(51, 102, 255, 0.5);
-        }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
 
-        .btn-green {
-            background: linear-gradient(45deg, #33cc33, #66ff66);
-            box-shadow: 0 0 20px rgba(51, 204, 51, 0.5);
-            display: none;
-        }
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
 
-        .btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
 
-        .btn:active {
-            transform: translateY(1px);
-        }
+    .copy-btn {
+        padding: 0.5rem 1rem;
+        margin-left: 10px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(45deg, #3366ff, #33ccff);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-        .checkmark {
-            display: none;
-            color: #33ff33;
-            font-size: 2rem;
-            margin-left: 15px;
-            text-shadow: 0 0 10px rgba(51, 255, 51, 0.8);
-            animation: checkmarkGlow 1.5s ease-in-out infinite alternate;
-        }
+    .timer {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: #ff6b6b;
+    }
 
-        @keyframes checkmarkGlow {
-            from {
-                text-shadow: 0 0 5px rgba(51, 255, 51, 0.8);
-            }
-            to {
-                text-shadow: 0 0 20px rgba(51, 255, 51, 1);
-            }
-        }
+    .snowflake {
+        top: -20px;
+    }
+</style>
 
-        .snowflake {
-            position: absolute;
-            color: white;
-            text-shadow: 0 0 10px #fff,
-                         0 0 20px #fff,
-                         0 0 30px #fff;
-            animation: fall linear infinite;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-            }
-        }
-
-        #generatedKey {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            display: none;
-            font-size: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
-            animation: keyGlow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes keyGlow {
-            from {
-                box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
-            }
-            to {
-                box-shadow: 0 0 40px rgba(51, 102, 255, 0.6);
-            }
-        }
-    </style>
-</head>
 <body>
     <div class="container">
-        <h1>Key System</h1>
-        <button class="btn btn-red" id="likeBtn">Like Video</button>
-        <span class="checkmark" id="likeCheck">✓</span>
-        <br>
-        <button class="btn btn-blue" id="subBtn">Subscribe</button>
-        <span class="checkmark" id="subCheck">✓</span>
-        <br>
-        <button class="btn btn-green" id="generateBtn">Generate Key</button>
-        <div id="generatedKey"></div>
+        <!-- Previous container content -->
+        <div id="waitTimer" class="timer"></div>
+        <div id="cooldownTimer" class="timer"></div>
+    </div>
+
+    <div class="settings-btn" onclick="toggleSettings()">⚙️</div>
+    <div class="settings-panel" id="settingsPanel">
+        <label class="switch">
+            <input type="checkbox" id="diddyMode" onchange="toggleDiddyMode()">
+            <span class="slider"></span>
+        </label>
+        <span style="margin-left: 10px;">Diddy Mode</span>
     </div>
 
     <script>
-        const { createClient } = supabase;
-        const supabaseClient = createClient(
-            'https://qwvcwzwhtgsyrxzxkove.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dmN3endodGdzeXJ4enhrb3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0MjE0MjgsImV4cCI6MjA1MDk5NzQyOH0.XRGQN4CriGsPOLeqRaIMAxuXYv0VwnwKjPCGlrn6JxI'
-        );
+        // Add these variables at the top of your script
+        let timeOnSite = 0;
+        let lastKeyGeneration = localStorage.getItem('lastKeyGeneration') || 0;
+        let isDiddyMode = false;
+        const WAIT_TIME = 480; // 8 minutes in seconds
+        const DAY_IN_MS = 86400000;
 
-        let likeCompleted = false;
-        let subCompleted = false;
-
+        // Update the createSnowflakes function
         function createSnowflakes() {
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
-            snowflake.innerHTML = '❄';
+            snowflake.innerHTML = isDiddyMode ? '🧴' : '❄';
             snowflake.style.left = Math.random() * 100 + 'vw';
             snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
             snowflake.style.opacity = Math.random() * 0.7 + 0.3;
@@ -184,57 +132,72 @@
             setTimeout(() => snowflake.remove(), 5000);
         }
 
-        setInterval(createSnowflakes, 100);
-
-        async function generateKey() {
-            const { data, error } = await supabaseClient
-                .from('keys')
-                .insert([{
-                    key_value: crypto.randomUUID(),
-                    expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                    already_redeemed: false
-                }])
-                .select();
-
-            if (error) {
-                console.error('Error:', error);
-                return null;
-            }
-            return data[0].key_value;
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
-        document.getElementById('likeBtn').addEventListener('click', async () => {
-            window.open('https://www.youtube.com/watch?v=ViTGUTtPzT4', '_blank');
-            setTimeout(() => {
-                document.getElementById('likeCheck').style.display = 'inline';
-                likeCompleted = true;
-                checkCompletion();
-            }, 5000);
-        });
+        function toggleDiddyMode() {
+            isDiddyMode = !isDiddyMode;
+            document.body.style.background = isDiddyMode 
+                ? `url('https://c.files.bbci.co.uk/ffe3/live/86564f40-7ab4-11ef-aa23-ff25bf1fd4c4.jpg') center/cover`
+                : 'linear-gradient(135deg, #0f0f1f, #1f1f3f)';
+        }
 
-        document.getElementById('subBtn').addEventListener('click', async () => {
-            window.open('https://www.youtube.com/@BestScriptsforrobloxs', '_blank');
-            setTimeout(() => {
-                document.getElementById('subCheck').style.display = 'inline';
-                subCompleted = true;
-                checkCompletion();
-            }, 5000);
-        });
+        function updateTimers() {
+            timeOnSite++;
+            const waitTimer = document.getElementById('waitTimer');
+            const cooldownTimer = document.getElementById('cooldownTimer');
+            const timeLeft = WAIT_TIME - timeOnSite;
+            
+            if (timeLeft > 0) {
+                waitTimer.textContent = `Wait time remaining: ${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')}`;
+                document.getElementById('generateBtn').style.display = 'none';
+            } else {
+                waitTimer.textContent = '';
+                if (likeCompleted && subCompleted) {
+                    document.getElementById('generateBtn').style.display = 'inline-block';
+                }
+            }
 
-        function checkCompletion() {
-            if (likeCompleted && subCompleted) {
-                document.getElementById('generateBtn').style.display = 'inline-block';
+            const nextGeneration = parseInt(lastKeyGeneration) + DAY_IN_MS;
+            const now = Date.now();
+            if (nextGeneration > now) {
+                const hoursLeft = Math.floor((nextGeneration - now) / 3600000);
+                const minutesLeft = Math.floor(((nextGeneration - now) % 3600000) / 60000);
+                cooldownTimer.textContent = `Next key available in: ${hoursLeft}h ${minutesLeft}m`;
+                document.getElementById('generateBtn').disabled = true;
+            } else {
+                cooldownTimer.textContent = '';
+                document.getElementById('generateBtn').disabled = false;
             }
         }
 
+        // Update the generateKey function
         document.getElementById('generateBtn').addEventListener('click', async () => {
+            if (timeOnSite < WAIT_TIME) return;
+            
             const key = await generateKey();
             if (key) {
                 const keyDiv = document.getElementById('generatedKey');
                 keyDiv.style.display = 'block';
-                keyDiv.textContent = `Your Key: ${key}`;
+                keyDiv.innerHTML = `Your Key: ${key} <button class="copy-btn" onclick="copyKey('${key}')">Copy</button>`;
+                lastKeyGeneration = Date.now();
+                localStorage.setItem('lastKeyGeneration', lastKeyGeneration);
+                updateTimers();
             }
         });
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key);
+            const copyBtn = document.querySelector('.copy-btn');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+        }
+
+        setInterval(createSnowflakes, 100);
+        setInterval(updateTimers, 1000);
+        updateTimers();
     </script>
 </body>
 </html>
