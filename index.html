@@ -9,7 +9,7 @@
         body {
             margin: 0;
             min-height: 100vh;
-            background: #0f0f0f;
+            background: linear-gradient(135deg, #0f0f1f, #1f1f3f);
             font-family: 'Arial', sans-serif;
             color: white;
             display: flex;
@@ -23,80 +23,129 @@
         .container {
             text-align: center;
             z-index: 1;
-            background: rgba(25, 25, 25, 0.9);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            background: rgba(25, 25, 35, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7),
+                        0 0 60px rgba(51, 102, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, #ff3366, #ff6b6b);
+            font-size: 3.5rem;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(45deg, #ff3366, #ff6b6b, #3366ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 51, 102, 0.8);
+            }
         }
 
         .btn {
-            padding: 1rem 2rem;
-            margin: 0.5rem;
+            padding: 1.2rem 2.5rem;
+            margin: 1rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
-            width: 200px;
+            width: 250px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .btn-red {
-            background: #ff3366;
-            color: white;
+            background: linear-gradient(45deg, #ff3366, #ff6b6b);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
         }
 
         .btn-blue {
-            background: #3366ff;
-            color: white;
+            background: linear-gradient(45deg, #3366ff, #33ccff);
+            box-shadow: 0 0 20px rgba(51, 102, 255, 0.5);
         }
 
         .btn-green {
-            background: #33cc33;
-            color: white;
+            background: linear-gradient(45deg, #33cc33, #66ff66);
+            box-shadow: 0 0 20px rgba(51, 204, 51, 0.5);
             display: none;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
         }
 
         .checkmark {
             display: none;
-            color: #33cc33;
-            font-size: 1.5rem;
-            margin-left: 10px;
+            color: #33ff33;
+            font-size: 2rem;
+            margin-left: 15px;
+            text-shadow: 0 0 10px rgba(51, 255, 51, 0.8);
+            animation: checkmarkGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes checkmarkGlow {
+            from {
+                text-shadow: 0 0 5px rgba(51, 255, 51, 0.8);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(51, 255, 51, 1);
+            }
         }
 
         .snowflake {
             position: absolute;
             color: white;
-            text-shadow: 0 0 5px #fff;
+            text-shadow: 0 0 10px #fff,
+                         0 0 20px #fff,
+                         0 0 30px #fff;
             animation: fall linear infinite;
+            z-index: 0;
+            pointer-events: none;
         }
 
         @keyframes fall {
             to {
-                transform: translateY(100vh);
+                transform: translateY(100vh) rotate(360deg);
             }
         }
 
         #generatedKey {
-            margin-top: 1rem;
-            padding: 1rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 12px;
             display: none;
+            font-size: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
+            animation: keyGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes keyGlow {
+            from {
+                box-shadow: 0 0 20px rgba(51, 102, 255, 0.3);
+            }
+            to {
+                box-shadow: 0 0 40px rgba(51, 102, 255, 0.6);
+            }
         }
     </style>
 </head>
@@ -128,13 +177,13 @@
             snowflake.innerHTML = '❄';
             snowflake.style.left = Math.random() * 100 + 'vw';
             snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-            snowflake.style.opacity = Math.random();
-            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+            snowflake.style.fontSize = Math.random() * 15 + 15 + 'px';
             document.body.appendChild(snowflake);
             setTimeout(() => snowflake.remove(), 5000);
         }
 
-        setInterval(createSnowflakes, 50);
+        setInterval(createSnowflakes, 100);
 
         async function generateKey() {
             const { data, error } = await supabase
