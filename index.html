@@ -163,7 +163,8 @@
     </div>
 
     <script>
-        const supabase = supabase.createClient(
+        const { createClient } = supabase;
+        const supabaseClient = createClient(
             'https://qwvcwzwhtgsyrxzxkove.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dmN3endodGdzeXJ4enhrb3ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0MjE0MjgsImV4cCI6MjA1MDk5NzQyOH0.XRGQN4CriGsPOLeqRaIMAxuXYv0VwnwKjPCGlrn6JxI'
         );
@@ -186,7 +187,7 @@
         setInterval(createSnowflakes, 100);
 
         async function generateKey() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('keys')
                 .insert([{
                     key_value: crypto.randomUUID(),
@@ -208,7 +209,7 @@
                 document.getElementById('likeCheck').style.display = 'inline';
                 likeCompleted = true;
                 checkCompletion();
-            }, 5000); // 5 seconds after opening the like video
+            }, 5000);
         });
 
         document.getElementById('subBtn').addEventListener('click', async () => {
@@ -217,7 +218,7 @@
                 document.getElementById('subCheck').style.display = 'inline';
                 subCompleted = true;
                 checkCompletion();
-            }, 5000); // 5 seconds after opening the subscribe link
+            }, 5000);
         });
 
         function checkCompletion() {
